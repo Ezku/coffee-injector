@@ -10,12 +10,13 @@ module.exports = class Container
 		@resources[name]?
 	
 	set: (name, value) ->
-		@describe name, (success, failure) -> success value
+		@describe name, (result, error) ->
+			result value
 
 	get: (name) ->
 		throw new Error("Resource '#{name}' not available") if not @resources[name]?
 		deferred = defer()
-		@resources[name].call @, deferred.resolve, deferred.resolve
+		@resources[name].call @, deferred.resolve, deferred.reject
 		deferred.promise
 
 	describe: (name, descriptor) ->

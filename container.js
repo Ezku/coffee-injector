@@ -10,8 +10,8 @@
       return this.resources[name] != null;
     };
     Container.prototype.set = function(name, value) {
-      return this.describe(name, function(success, failure) {
-        return success(value);
+      return this.describe(name, function(result, error) {
+        return result(value);
       });
     };
     Container.prototype.get = function(name) {
@@ -20,7 +20,7 @@
         throw new Error("Resource '" + name + "' not available");
       }
       deferred = defer();
-      this.resources[name].call(this, deferred.resolve, deferred.resolve);
+      this.resources[name].call(this, deferred.resolve, deferred.reject);
       return deferred.promise;
     };
     Container.prototype.describe = function(name, descriptor) {

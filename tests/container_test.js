@@ -1,5 +1,5 @@
 (function() {
-  var Container, EventEmitter, async, vows;
+  var Container, EventEmitter, async, expect, vows;
   var __slice = Array.prototype.slice;
   require('should');
   vows = require('vows');
@@ -15,6 +15,11 @@
         return promise.emit('error', error);
       }]));
       return promise;
+    };
+  };
+  expect = function(expectation) {
+    return function(result) {
+      return result.should.equal(expectation);
     };
   };
   vows.describe('Using the coffee injector container').addBatch({
@@ -40,6 +45,24 @@
       'should be able to describe a resource': function(c) {
         c.describe('foo', function() {});
         return c.has('foo').should.be["true"];
+      },
+      'when describing a resource successfully': {
+        topic: async(function(c, success, failure) {
+          c.describe('foo', function(result) {
+            return result('bar');
+          });
+          return c.get('foo').then(success, failure);
+        }),
+        'should recieve a value in the success callback': expect('bar')
+      },
+      'when describing a resource that fails': {
+        topic: async(function(c, success, failure) {
+          c.describe('foo', function(result, error) {
+            return error('bar');
+          });
+          return c.get('foo').then(failure, success);
+        }),
+        'should recieve a value in the failure callback': expect('bar')
       }
     },
     'given a container with a scalar value set': {
@@ -48,13 +71,11 @@
         c = new Container;
         return c.set('foo', 'bar');
       },
-      'when accessing the value in a continuation': {
+      'when passing a continuation': {
         topic: async(function(c, success, error) {
           return c.get('foo').then(success, error);
         }),
-        'the value should be the first argument': function(value) {
-          return value.should.equal('bar');
-        }
+        'should recieve a value': expect('bar')
       }
     }
   })["export"](module);

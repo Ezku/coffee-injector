@@ -10,6 +10,9 @@ async = (f) -> ->
 		(error) -> promise.emit 'error', error
 	promise
 
+expect = (expectation) ->
+	(result) -> result.should.equal expectation
+
 vows
 .describe('Using the coffee injector container')
 .addBatch
@@ -34,17 +37,31 @@ vows
 		'should be able to describe a resource': (c) ->
 			c.describe 'foo', ->
 			c.has('foo').should.be.true
+		
+		'when describing a resource successfully':
+			topic: async (c, success, failure) ->
+				c.describe 'foo', (result) -> result 'bar'
+				c.get('foo').then success, failure
+			
+			'should recieve a value in the success callback': expect 'bar'
+	
+		'when describing a resource that fails':
+			topic: async (c, success, failure) ->
+				c.describe 'foo', (result, error) -> error 'bar'
+				c.get('foo').then failure, success
+			
+			'should recieve a value in the failure callback': expect 'bar'
 				
 	'given a container with a scalar value set':
 		topic: ->
 			c = new Container
 			c.set 'foo', 'bar'
 		
-		'when accessing the value in a continuation': 
+		'when passing a continuation': 
 			topic: async (c, success, error) ->
 				c.get('foo').then success, error
 			
-			'the value should be the first argument': (value) ->
-				value.should.equal 'bar'
+			'should recieve a value': expect 'bar'
+			
 
 .export(module)
