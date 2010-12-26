@@ -1,5 +1,6 @@
 (function() {
-  var Container;
+  var Container, defer;
+  defer = require('./node-promise/promise').defer;
   module.exports = Container = (function() {
     Container.prototype.resources = null;
     function Container() {
@@ -9,15 +10,18 @@
       return this.resources[name] != null;
     };
     Container.prototype.set = function(name, value) {
-      return this.describe(name, function() {
-        return value;
+      return this.describe(name, function(success, failure) {
+        return success(value);
       });
     };
     Container.prototype.get = function(name) {
+      var deferred;
       if (!(this.resources[name] != null)) {
         throw new Error("Resource '" + name + "' not available");
       }
-      return this.resources[name].call(this);
+      deferred = defer();
+      this.resources[name].call(this, deferred.resolve, deferred.resolve);
+      return deferred.promise;
     };
     Container.prototype.describe = function(name, descriptor) {
       this.resources[name] = descriptor;
