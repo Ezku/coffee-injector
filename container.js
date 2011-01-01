@@ -8,6 +8,11 @@
     f(deferred.resolve, deferred.reject);
     return deferred.promise;
   };
+  /*
+  Given a list of promises, creates a promise that will be resolved or rejected
+  when all the promises on the list have either been resolved or rejected. In
+  case of mixed successes the result will be a rejection.
+  */
   all = function(promises) {
     return promise(function(resolve, reject) {
       var next, p, rejected, resolved, _i, _len, _results;
