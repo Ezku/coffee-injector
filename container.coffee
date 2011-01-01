@@ -5,6 +5,11 @@ promise = (f) ->
 	f deferred.resolve, deferred.reject
 	deferred.promise
 
+###
+Given a list of promises, creates a promise that will be resolved or rejected
+when all the promises on the list have either been resolved or rejected. In
+case of mixed successes the result will be a rejection.
+###
 all = (promises) -> promise (resolve, reject) ->
 	resolve() if promises.length is 0
 	resolved = []
@@ -48,7 +53,7 @@ module.exports = class Container
 		
 		else
 			promises = (@get name for name in arguments)
-			all(promises)
+			all promises
 
 	describe: (name, descriptor) ->
 		@resources[name] = descriptor
