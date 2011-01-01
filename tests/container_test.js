@@ -92,11 +92,33 @@
         topic: async(function(c, success, failure) {
           return c.get('foo', 'foo').then(failure, success);
         }),
-        'should recieve all errors': function(values) {
+        'should recieve all errors in the failure callback': function(errors) {
           var first, second;
-          first = values[0], second = values[1];
+          first = errors[0], second = errors[1];
           return 'bar'.should.equal(first).and.equal(second);
         }
+      }
+    },
+    'given a succeeding and a failing resource description': {
+      topic: function() {
+        var c;
+        c = new Container;
+        c.describe('foo', function(result) {
+          return result('yay');
+        });
+        return c.describe('bar', function(result, error) {
+          return error('nay');
+        });
+      },
+      'when retrieving both values': function() {
+        return {
+          topic: async(function(c, success, failure) {
+            return c.get('foo', 'bar').then(failure, success);
+          }),
+          'should recieve an error in the failure callback': function(errors) {
+            return errors[0].should.equal('nay');
+          }
+        };
       }
     }
   })["export"](module);

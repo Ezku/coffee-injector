@@ -1,12 +1,44 @@
 (function() {
-  var Container, all, defer, promise, _ref;
+  var Container, all, defer, promise;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  _ref = require('./node-promise/promise'), defer = _ref.defer, all = _ref.all;
+  defer = require('./node-promise/promise').defer;
   promise = function(f) {
     var deferred;
     deferred = defer();
     f(deferred.resolve, deferred.reject);
     return deferred.promise;
+  };
+  all = function(promises) {
+    return promise(function(resolve, reject) {
+      var next, p, rejected, resolved, _i, _len, _results;
+      if (promises.length === 0) {
+        resolve();
+      }
+      resolved = [];
+      rejected = [];
+      next = function() {
+        if (resolved.length + rejected.length !== promises.length) {
+          return;
+        }
+        if (rejected.length === 0) {
+          return resolve(resolved);
+        } else {
+          return reject(rejected);
+        }
+      };
+      _results = [];
+      for (_i = 0, _len = promises.length; _i < _len; _i++) {
+        p = promises[_i];
+        _results.push(p.then(function(value) {
+          resolved.push(value);
+          return next();
+        }, function(error) {
+          rejected.push(error);
+          return next();
+        }));
+      }
+      return _results;
+    });
   };
   module.exports = Container = (function() {
     Container.prototype.resources = null;

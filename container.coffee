@@ -1,9 +1,31 @@
-{defer, all} = require './node-promise/promise'
+{defer} = require './node-promise/promise'
 
 promise = (f) ->
 	deferred = defer()
 	f deferred.resolve, deferred.reject
 	deferred.promise
+
+all = (promises) -> promise (resolve, reject) ->
+	resolve() if promises.length is 0
+	resolved = []
+	rejected = []
+	
+	next = ->
+		return unless resolved.length + rejected.length == promises.length
+		if rejected.length is 0
+			resolve resolved
+		else
+			reject rejected
+	
+	for p in promises
+		p.then (value) ->
+				resolved.push value
+				do next
+			, (error) ->
+				rejected.push error
+				do next	
+	
+	
 
 module.exports = class Container
 	resources: null

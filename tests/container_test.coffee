@@ -56,6 +56,7 @@ vows
 			'should recieve all selected values': (values) ->
 				[first, second] = values
 				'bar'.should.equal(first).and.equal(second)
+				
 		
 	'given a failing resource description':
 		topic: ->
@@ -72,8 +73,21 @@ vows
 			topic: async (c, success, failure) ->
 				c.get('foo', 'foo').then failure, success
 
-			'should recieve all errors': (values) ->
-				[first, second] = values
+			'should recieve all errors in the failure callback': (errors) ->
+				[first, second] = errors
 				'bar'.should.equal(first).and.equal(second)
+	
+	'given a succeeding and a failing resource description':
+		topic: ->
+			c = new Container
+			c.describe 'foo', (result) -> result 'yay'
+			c.describe 'bar', (result, error) -> error 'nay'
+		
+		'when retrieving both values': ->
+			topic: async (c, success, failure) ->
+				c.get('foo', 'bar').then failure, success
+			
+			'should recieve an error in the failure callback': (errors) ->
+				errors[0].should.equal 'nay'
 			
 .export(module)
