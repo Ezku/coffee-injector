@@ -45,37 +45,58 @@
       'should be able to describe a resource': function(c) {
         c.describe('foo', function() {});
         return c.has('foo').should.be["true"];
+      }
+    },
+    'given a succeeding resource description': {
+      topic: function() {
+        var c;
+        c = new Container;
+        return c.describe('foo', function(result) {
+          return result('bar');
+        });
       },
-      'when describing a resource successfully': {
+      'when attempting retrieval': {
         topic: async(function(c, success, failure) {
-          c.describe('foo', function(result) {
-            return result('bar');
-          });
           return c.get('foo').then(success, failure);
         }),
         'should recieve a value in the success callback': expect('bar')
       },
-      'when describing a resource that fails': {
+      'when retrieving multiple values at a time': {
         topic: async(function(c, success, failure) {
-          c.describe('foo', function(result, error) {
-            return error('bar');
-          });
-          return c.get('foo').then(failure, success);
+          return c.get('foo', 'foo').then(success, failure);
         }),
-        'should recieve a value in the failure callback': expect('bar')
+        'should recieve all selected values': function(values) {
+          var first, second;
+          first = values[0], second = values[1];
+          return 'bar'.should.equal(first).and.equal(second);
+        }
       }
     },
-    'given a container with a scalar value set': {
+    'given a failing resource description': {
       topic: function() {
         var c;
         c = new Container;
-        return c.set('foo', 'bar');
+        return c.describe('foo', function(result, error) {
+          return error('bar');
+        });
       },
-      'when passing a continuation': {
-        topic: async(function(c, success, error) {
-          return c.get('foo').then(success, error);
+      'when attempting retrieval': {
+        topic: async(function(c, success, failure) {
+          c.get('foo').then(failure, success);
+          return {
+            'should recieve a value in the failure callback': expect('bar')
+          };
+        })
+      },
+      'when retrieving multiple values at a time': {
+        topic: async(function(c, success, failure) {
+          return c.get('foo', 'foo').then(failure, success);
         }),
-        'should recieve a value': expect('bar')
+        'should recieve all errors': function(values) {
+          var first, second;
+          first = values[0], second = values[1];
+          return 'bar'.should.equal(first).and.equal(second);
+        }
       }
     }
   })["export"](module);

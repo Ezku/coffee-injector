@@ -10,8 +10,8 @@ async = (f) -> ->
 		(error) -> promise.emit 'error', error
 	promise
 
-expect = (expectation) ->
-	(result) -> result.should.equal expectation
+expect = (expectation) -> (result) ->
+	result.should.equal expectation
 
 vows
 .describe('Using the coffee injector container')
@@ -28,7 +28,7 @@ vows
 				c.get('foo')
 				true.should.be.false
 			catch e
-				e.should.be.an.instanceof(Error)
+				e.should.be.an.instanceof Error
 		
 		'should be able to set a value': (c) ->
 			c.set 'foo', 'bar'
@@ -37,31 +37,43 @@ vows
 		'should be able to describe a resource': (c) ->
 			c.describe 'foo', ->
 			c.has('foo').should.be.true
-		
-		'when describing a resource successfully':
-			topic: async (c, success, failure) ->
-				c.describe 'foo', (result) -> result 'bar'
-				c.get('foo').then success, failure
-			
-			'should recieve a value in the success callback': expect 'bar'
 	
-		'when describing a resource that fails':
-			topic: async (c, success, failure) ->
-				c.describe 'foo', (result, error) -> error 'bar'
-				c.get('foo').then failure, success
-			
-			'should recieve a value in the failure callback': expect 'bar'
-				
-	'given a container with a scalar value set':
+	'given a succeeding resource description':
 		topic: ->
 			c = new Container
-			c.set 'foo', 'bar'
+			c.describe 'foo', (result) -> result 'bar'
 		
-		'when passing a continuation': 
-			topic: async (c, success, error) ->
-				c.get('foo').then success, error
+		'when attempting retrieval':
+			topic: async (c, success, failure) ->
+				c.get('foo').then success, failure
+				
+			'should recieve a value in the success callback': expect 'bar'
+		
+		'when retrieving multiple values at a time':
+			topic: async (c, success, failure) ->
+				c.get('foo', 'foo').then success, failure
 			
-			'should recieve a value': expect 'bar'
-			
+			'should recieve all selected values': (values) ->
+				[first, second] = values
+				'bar'.should.equal(first).and.equal(second)
+		
+	'given a failing resource description':
+		topic: ->
+			c = new Container
+			c.describe 'foo', (result, error) -> error 'bar'
+		
+		'when attempting retrieval':
+			topic: async (c, success, failure) ->
+				c.get('foo').then failure, success
+		
+				'should recieve a value in the failure callback': expect 'bar'
+		
+		'when retrieving multiple values at a time':
+			topic: async (c, success, failure) ->
+				c.get('foo', 'foo').then failure, success
 
+			'should recieve all errors': (values) ->
+				[first, second] = values
+				'bar'.should.equal(first).and.equal(second)
+			
 .export(module)

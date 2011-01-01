@@ -1,4 +1,9 @@
-{defer} = require './node-promise/promise'
+{defer, all} = require './node-promise/promise'
+
+promise = (f) ->
+	deferred = defer()
+	f deferred.resolve, deferred.reject
+	deferred.promise
 
 module.exports = class Container
 	resources: null
@@ -14,10 +19,14 @@ module.exports = class Container
 			result value
 
 	get: (name) ->
-		throw new Error("Resource '#{name}' not available") if not @resources[name]?
-		deferred = defer()
-		@resources[name].call @, deferred.resolve, deferred.reject
-		deferred.promise
+		if arguments.length is 1
+			throw new Error("Resource '#{name}' not available") if not @resources[name]?
+			promise (resolve, reject) =>
+				@resources[name].call @, resolve, reject
+		
+		else
+			promises = (@get name for name in arguments)
+			all(promises)
 
 	describe: (name, descriptor) ->
 		@resources[name] = descriptor
