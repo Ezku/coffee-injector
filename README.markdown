@@ -8,6 +8,9 @@ Javascript, takes advantage of the [node-promise][np] library for
 asynchrony and is unit tested using [vows][http://vowsjs.org/]. Read on 
 for details.
 
+[cs]: http://jashkenas.github.com/coffee-script/
+[np]: http://github.com/kriszyp/node-promise
+
 # Dependency injection the asynchronous way
 
 Dependency injection is an often used mechanism for achieving inversion 
