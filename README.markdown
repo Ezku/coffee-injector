@@ -5,7 +5,7 @@ to fit both Javascript as a language and node.js as an environment where
 asynchronous execution is the rule rather than the exception. It is 
 written in [CoffeeScript][cs], a terrific language that compiles into 
 Javascript, takes advantage of the [node-promise][np] library for 
-asynchrony and is unit tested using [vows][http://vowsjs.org/]. Read on 
+asynchrony and is unit tested using [vows](http://vowsjs.org/). Read on 
 for details.
 
 [cs]: http://jashkenas.github.com/coffee-script/
@@ -27,7 +27,7 @@ work for you.
 
 [d]: http://en.wikipedia.org/wiki/Dependency_inversion_principle
 [solid]: http://en.wikipedia.org/wiki/SOLID
-[iocc]: http://martinfowler.com/articles/injection.html "Martin Fowler on IOC and DI"
+[iocc]: http://martinfowler.com/articles/injection.html
 
 Coffee-Injector borrows in ideology from a minimalistic style applied in 
 [Ruby][ruby-di] and [PHP][php-di] that make use of closures for resource 
@@ -38,7 +38,7 @@ kind of resources it stores. As Fabien Potencier puts it,
 [ruby-di]: http://onestepback.org/index.cgi/Tech/Ruby/DependencyInjectionInRuby.rdoc
 [php-di]: http://fabien.potencier.org/article/17/on-php-5-3-lambda-functions-and-closures
 
->   "Defining objects with lambda functions is great because the developer can _do whatever he wants_ to actually create and configure instances." (Emphasis added.)
+>   "Defining objects with lambda functions is great because the developer can *do whatever* he wants" (Emphasis added.)
 
 The essence of Coffee-Injector is to give you everything you need to set 
 up your resources and resolve their dependencies, then get out of the 
