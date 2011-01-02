@@ -27,19 +27,18 @@ work for you.
 [iocc]: http://martinfowler.com/articles/injection.html "Martin Fowler on IOC and DI"
 
 Coffee-Injector borrows in ideology from a minimalistic style applied in 
-[Ruby][ruby-di] and [PHP][php-di] that apply closures for resource 
-description. "Defining objects with lambda functions is great because 
-the developer can do whatever he wants to actually create and configure 
-instances."
+[Ruby][ruby-di] and [PHP][php-di] that make use of closures for resource 
+description. This, as opposed to automatic constructor and setter 
+injection of objects, allows the container to remain agnostic of the 
+kind of resources it stores. As Fabien Potencier puts it,
 
 [ruby-di]: http://onestepback.org/index.cgi/Tech/Ruby/DependencyInjectionInRuby.rdoc
 [php-di]: http://fabien.potencier.org/article/17/on-php-5-3-lambda-functions-and-closures
 
+>   "Defining objects with lambda functions is great because the developer can _do whatever he wants_ to actually create and configure instances." (Emphasis added.)
 
-<!--
-Adding convenience methods:
+The essence of Coffee-Injector is to give you everything you need to set 
+up your resources and resolve their dependencies, then get out of the 
+way. Because of the asynchronous nature of node.js, a sprinkle of 
+Promises are added on top, but that is the gist of it.
 
-c = new Container
-c::static = (f) ->
-	result = null
--->
