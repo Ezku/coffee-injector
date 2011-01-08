@@ -28,9 +28,7 @@ all = (promises) -> promise (resolve, reject) ->
 				do next
 			, (error) ->
 				rejected.push error
-				do next	
-	
-	
+				do next
 
 module.exports = class Container
 	resources: null
@@ -48,6 +46,7 @@ module.exports = class Container
 	get: (name) ->
 		if arguments.length is 1
 			throw new Error("Resource '#{name}' not available") if not @resources[name]?
+			throw new Error("Recursive definition of resource '#{name}' detected") if false
 			promise (resolve, reject) =>
 				@resources[name].call @, resolve, reject
 		

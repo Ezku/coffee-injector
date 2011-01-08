@@ -11,7 +11,7 @@ for details.
 [cs]: http://jashkenas.github.com/coffee-script/
 [np]: http://github.com/kriszyp/node-promise
 
-# Dependency injection the asynchronous way
+# Dependency injection the node.js way
 
 Dependency injection is an often used mechanism for achieving inversion 
 of control, a design principle related to the [D][d] in [SOLID][solid]. 
@@ -42,13 +42,19 @@ Fabien Potencier puts it,
 [ruby-di]: http://onestepback.org/index.cgi/Tech/Ruby/DependencyInjectionInRuby.rdoc
 [php-di]: http://fabien.potencier.org/article/17/on-php-5-3-lambda-functions-and-closures
 
->   "Defining objects with lambda functions is great because the developer can *do whatever* he wants" (Emphasis added.)
+>   "Defining objects with lambda functions is great because *the developer can do whatever he wants*"
 
 The essence of Coffee-Injector is to give you everything you need to set 
 up your resources and resolve their dependencies, then get out of the 
 way. You get a way to configure your application in one place. Because 
 of the asynchronous nature of node.js, a sprinkle of Promises is added 
-on top, but that is the gist of it.
+on top, but that is the gist of it. No bells and whistles.
+
+# Usage
+
+## Describing resources and using them
+
+## Resource description helpers
 
 # Installation and available cake tasks
 

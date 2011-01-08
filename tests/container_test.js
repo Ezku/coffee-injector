@@ -1,10 +1,19 @@
 (function() {
-  var Container, EventEmitter, async, expect, vows;
+  var Assertion, Container, EventEmitter, async, expect, vows;
   var __slice = Array.prototype.slice;
-  require('should');
   vows = require('vows');
   Container = require('../container');
+  Assertion = require('should').Assertion;
   EventEmitter = require('events').EventEmitter;
+  Assertion.prototype["throw"] = Assertion.prototype.thrown = function(f) {
+    try {
+      f();
+      this.assert(false, 'expected an exception to be thrown');
+    } catch (e) {
+      e.should.be.an["instanceof"](this.obj);
+    }
+    return this;
+  };
   async = function(f) {
     return function() {
       var promise;
@@ -31,12 +40,9 @@
         return c.has('foo').should.be["false"];
       },
       'get should result in an exception': function(c) {
-        try {
-          c.get('foo');
-          return true.should.be["false"];
-        } catch (e) {
-          return e.should.be.an["instanceof"](Error);
-        }
+        return Error.should.be.thrown(function() {
+          return c.get('foo');
+        });
       },
       'should be able to set a value': function(c) {
         c.set('foo', 'bar');
@@ -45,6 +51,23 @@
       'should be able to describe a resource': function(c) {
         c.describe('foo', function() {});
         return c.has('foo').should.be["true"];
+      },
+      'should be able to access has in a resource description': function(c) {
+        c.describe('foo', function() {
+          return this.has('foo').should.be["true"];
+        });
+        return c.get('foo');
+      },
+      'getting the resource under description should lead to an exception': function(c) {
+        try {
+          c.describe('foo', function() {
+            return this.get('foo');
+          });
+          return c.get('foo');
+        } catch (e) {
+          e.should.not.be.an["instanceof"](RangeError);
+          return e.should.be.an["instanceof"](Error);
+        }
       }
     },
     'given a succeeding resource description': {

@@ -1,7 +1,15 @@
-require 'should'
 vows = require 'vows'
 Container = require '../container'
+{Assertion} = require 'should'
 {EventEmitter} = require 'events'
+
+Assertion::throw = Assertion::thrown = (f) ->
+	try
+		do f
+		@assert false, 'expected an exception to be thrown'
+	catch e
+		e.should.be.an.instanceof @obj
+	@
 
 async = (f) -> ->
 	promise = new EventEmitter
@@ -24,11 +32,7 @@ vows
 			c.has('foo').should.be.false
 		
 		'get should result in an exception': (c) ->
-			try
-				c.get('foo')
-				true.should.be.false
-			catch e
-				e.should.be.an.instanceof Error
+			Error.should.be.thrown -> c.get 'foo'
 		
 		'should be able to set a value': (c) ->
 			c.set 'foo', 'bar'
@@ -37,6 +41,20 @@ vows
 		'should be able to describe a resource': (c) ->
 			c.describe 'foo', ->
 			c.has('foo').should.be.true
+		
+		'should be able to access has in a resource description': (c) ->
+			c.describe 'foo', ->
+				@has('foo').should.be.true
+			c.get 'foo'
+		
+		'getting the resource under description should lead to an exception': (c) ->
+			try
+				c.describe 'foo', ->
+					@get 'foo'
+				c.get 'foo'
+			catch e
+				e.should.not.be.an.instanceof RangeError
+				e.should.be.an.instanceof Error
 	
 	'given a succeeding resource description':
 		topic: ->
@@ -89,5 +107,5 @@ vows
 			
 			'should recieve an error in the failure callback': (errors) ->
 				errors[0].should.equal 'nay'
-			
+	
 .export(module)

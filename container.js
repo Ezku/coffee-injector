@@ -64,6 +64,9 @@
         if (!(this.resources[name] != null)) {
           throw new Error("Resource '" + name + "' not available");
         }
+        if (false) {
+          throw new Error("Recursive definition of resource '" + name + "' detected");
+        }
         return promise(__bind(function(resolve, reject) {
           return this.resources[name].call(this, resolve, reject);
         }, this));
