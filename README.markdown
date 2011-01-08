@@ -48,9 +48,9 @@ The essence of Coffee-Injector is to give you everything you need to set
 up your resources and resolve their dependencies, then get out of the 
 way. You get a way to configure your application in one place. Because 
 of the asynchronous nature of node.js, a sprinkle of Promises is added 
-on top, but that is the gist of it. No bells and whistles.
+on top, but that is the extent of it. No bells and whistles.
 
-# Usage
+# Features and usage
 
 ## Describing resources and using them
 
