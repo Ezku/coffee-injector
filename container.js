@@ -1,11 +1,16 @@
 (function() {
   var Container, all, defer, promise;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  }, __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   defer = require('./node-promise/promise').defer;
   promise = function(f) {
-    var deferred;
+    var deferred, result;
     deferred = defer();
-    f(deferred.resolve, deferred.reject);
+    result = f(deferred.resolve, deferred.reject);
     return deferred.promise;
   };
   /*
@@ -45,10 +50,17 @@
       return _results;
     });
   };
+  /*
+  TODO: Separate container into two parts: resource description and dependency
+  resolution. This will allow for all kinds of helpers in the resource description
+  part while keeping the dependency resolver clean.
+  */
   module.exports = Container = (function() {
     Container.prototype.resources = null;
-    function Container() {
-      this.resources = {};
+    Container.prototype.busy = null;
+    function Container(resources, busy) {
+      this.resources = resources != null ? resources : {};
+      this.busy = busy != null ? busy : [];
     }
     Container.prototype.has = function(name) {
       return this.resources[name] != null;
@@ -58,17 +70,21 @@
         return result(value);
       });
     };
+    Container.prototype.using = function(name) {
+      if (__indexOf.call(this.busy, name) >= 0) {
+        throw new Error("Recursive definition of resource '" + name + "' detected");
+      }
+      return new Container(this.resources, __slice.call(this.busy).concat([name]));
+    };
     Container.prototype.get = function(name) {
-      var name, promises;
+      var name, promises, scope;
       if (arguments.length === 1) {
-        if (!(this.resources[name] != null)) {
+        if (this.resources[name] == null) {
           throw new Error("Resource '" + name + "' not available");
         }
-        if (false) {
-          throw new Error("Recursive definition of resource '" + name + "' detected");
-        }
+        scope = this.using(name);
         return promise(__bind(function(resolve, reject) {
-          return this.resources[name].call(this, resolve, reject);
+          return this.resources[name].call(scope, resolve, reject, scope);
         }, this));
       } else {
         promises = (function() {

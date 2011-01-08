@@ -2,7 +2,7 @@
 
 promise = (f) ->
 	deferred = defer()
-	f deferred.resolve, deferred.reject
+	result = f deferred.resolve, deferred.reject
 	deferred.promise
 
 ###
@@ -30,11 +30,16 @@ all = (promises) -> promise (resolve, reject) ->
 				rejected.push error
 				do next
 
+###
+TODO: Separate container into two parts: resource description and dependency
+resolution. This will allow for all kinds of helpers in the resource description
+part while keeping the dependency resolver clean.
+###
 module.exports = class Container
 	resources: null
+	busy: null
 	
-	constructor: ->
-		@resources = {}
+	constructor: (@resources = {}, @busy = []) ->
 	
 	has: (name) ->
 		@resources[name]?
@@ -42,13 +47,19 @@ module.exports = class Container
 	set: (name, value) ->
 		@describe name, (result, error) ->
 			result value
+	
+	using: (name) ->
+		if name in @busy
+			throw new Error("Recursive definition of resource '#{name}' detected")
+		new Container @resources, [@busy..., name]
 
 	get: (name) ->
 		if arguments.length is 1
-			throw new Error("Resource '#{name}' not available") if not @resources[name]?
-			throw new Error("Recursive definition of resource '#{name}' detected") if false
+			unless @resources[name]?
+				throw new Error("Resource '#{name}' not available")
+			scope = @using name
 			promise (resolve, reject) =>
-				@resources[name].call @, resolve, reject
+				@resources[name].call scope, resolve, reject, scope
 		
 		else
 			promises = (@get name for name in arguments)

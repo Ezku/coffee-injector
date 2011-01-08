@@ -56,6 +56,8 @@ on top, but that is the gist of it. No bells and whistles.
 
 ## Resource description helpers
 
+## Cyclic dependency detection
+
 # Installation and available cake tasks
 
 Assuming you have node.js and npm installed:
