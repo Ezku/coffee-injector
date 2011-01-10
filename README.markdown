@@ -94,6 +94,11 @@ A trivial conversion will look something like the following.
 
 We provide the container with a callback function that takes two arguments, one for informing the container of a successful resource acquisition and one for reporting an erroneous result. Once our asynchronous callback function (that we passed to `readFile`) is invoked, we take corresponding action based on the callback's input. One thing you'll notice is that `example.txt` is explicitly contained in the definition. To get rid of the explicitness, we'll need to retrieve the value from the container itself. The descriptor function is ran in a scope that has access to accessor methods like `get`. So the full snippet, including using the resource, would look like this.
 	
+	fs = require 'fs'
+	Container = require 'path/to/coffee-injector/container.js'
+	
+	c = new Container
+	c.set 'filename', 'example.txt'
 	c.describe 'example', (result, error) ->
 		@get('filename').then (filename) ->
 			fs.readFile filename, (err, data) ->
