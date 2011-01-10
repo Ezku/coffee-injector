@@ -54,6 +54,59 @@ on top, but that is the extent of it. No bells and whistles.
 
 ## Describing resources and using them
 
+Using a dependency injection container should generally follow a pattern of [register-resolve-release][rrr], where you'll first configure the container, then retrieve root components and finally throw the container away. You'll be left with a small set of components with their dependencies fully resolved, meaning you're all set for launching your application. With the last, or the "release" step, being trivial, let's describe the first two in their basic forms with Coffee-Injector. We'll use accessing a local file as a simple example to include some asynchronous operations.
+
+[rrr]: http://blog.ploeh.dk/2010/09/29/TheRegisterResolveReleasePattern.aspx
+
+First, you'll need an instance of the container. This means requiring the container class and instantiating it.
+
+	Container = require 'path/to/coffee-injector/container.js'
+	c = new Container
+
+There are two ways to register resources with the container. You can either set a fully resolved value - for things that are neither asynchronous nor dependent on other values - or provide a descriptor for resolving said value. The first kind is trivial.
+
+	c.set 'filename', 'example.txt'
+	if c.has 'filename'
+		console.log "Successfully set a resource in the container!"
+
+To access the value, use - you guessed it - `get`. The result of `get`, however, is not the resource as you'd expect, but a `Promise`. A `Promise` has a singular method, `then`, that accepts two arguments: the first one will be called if the promise was kept and resolved to a value, the second one in case there was an error and the promise was rejected. (Promises are one suggestion for a standard asynchronous interface suggested by and discussed at [CommonJS][cjs-promise]. Go check it out!) In this case, the promise will always immediately be resolved to a value.
+
+[cjs-promise]: http://wiki.commonjs.org/wiki/Promises
+
+	c.get('filename').then (filename) ->
+		console.log filename
+
+The other way is to provide a description of the process required to access the resource. This description will be reused every time the resource is accessed. There are two things to note: the description is just code in which you may do whatever you want, but the results need to be announced using callback functions provided by the container. Let's look at how you would read a file using plain node.js libraries and then transform it into a Coffee-Injector resource description.
+
+	fs = require 'fs'
+	fs.readFile 'example.txt', (err, data) ->
+		throw err if err
+		console.log data
+
+A trivial conversion will look something like the following.
+
+    c.describe 'example', (result, error) ->
+		fs.readFile 'example.txt', (err, data) ->
+			if err
+				error err
+			else
+				result data
+
+We provide the container with a callback function that takes two arguments, one for informing the container of a successful resource acquisition and one for reporting an erroneous result. Once our asynchronous callback function (that we passed to `readFile`) is invoked, we take corresponding action based on the callback's input. One thing you'll notice is that `example.txt` is explicitly contained in the definition. To get rid of the explicitness, we'll need to retrieve the value from the container itself. The descriptor function is ran in a scope that has access to accessor methods like `get`. So the full snippet, including using the resource, would look like this.
+	
+	c.describe 'example', (result, error) ->
+		@get('filename').then (filename) ->
+			fs.readFile filename, (err, data) ->
+				if err
+					error err
+				else
+					result data
+	
+	c.get('example').then (data) ->
+		console.log data
+
+The result we get is a decoupling of the wiring and the execution parts of the script.
+
 ## Resource description helpers
 
 ## Cyclic dependency detection

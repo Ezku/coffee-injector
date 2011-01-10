@@ -74,6 +74,15 @@ vows
 			'should recieve all selected values': (values) ->
 				[first, second] = values
 				'bar'.should.equal(first).and.equal(second)
+		
+		'when describing another resource that accesses the first resource':
+			topic: async (c, success, failure) ->
+				c.describe 'qux', (result) ->
+					@get('foo').then (foo) ->
+						result foo
+				c.get('qux').then success, failure
+			
+			'should be able to successfully retrieve the value': expect 'bar'
 				
 		
 	'given a failing resource description':

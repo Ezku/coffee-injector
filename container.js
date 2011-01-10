@@ -54,6 +54,13 @@
   TODO: Separate container into two parts: resource description and dependency
   resolution. This will allow for all kinds of helpers in the resource description
   part while keeping the dependency resolver clean.
+
+  Resolver:
+  - has
+  - get
+  Descriptor:
+  - set
+  - describe
   */
   module.exports = Container = (function() {
     Container.prototype.resources = null;

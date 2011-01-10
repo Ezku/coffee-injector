@@ -93,6 +93,18 @@
           first = values[0], second = values[1];
           return 'bar'.should.equal(first).and.equal(second);
         }
+      },
+      'when describing another resource that accesses the first resource': {
+        topic: async(function(c, success, failure) {
+          c.describe('qux', function(result) {
+            return this.get('foo').then(function(foo) {
+              console.log('lol');
+              return result(foo);
+            });
+          });
+          return c.get('qux').then(success, failure);
+        }),
+        'should be able to successfully retrieve the value': expect('bar')
       }
     },
     'given a failing resource description': {
