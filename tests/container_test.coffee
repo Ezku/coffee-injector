@@ -28,8 +28,6 @@ vows
 		topic: ->
 			new Container
 		
-		'what happens if i call the container': (c) ->
-		
 		'has should return false': (c) ->
 			c.has('foo').should.be.false
 		
