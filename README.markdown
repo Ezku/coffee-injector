@@ -48,7 +48,9 @@ The essence of Coffee-Injector is to give you everything you need to set
 up your resources and resolve their dependencies, then get out of the 
 way. You get a way to configure your application in one place. Because 
 of the asynchronous nature of node.js, a sprinkle of Promises is added 
-on top, but that is the extent of it. No bells and whistles.
+on top, but that is the extent of it. No bells and whistles. (Promises are one suggestion for a standard asynchronous interface suggested by and discussed at [CommonJS][cjs-promise]. Go check it out!) 
+
+[cjs-promise]: http://wiki.commonjs.org/wiki/Promises
 
 # Features and usage
 
@@ -69,9 +71,7 @@ There are two ways to register resources with the container. You can either set 
 	if c.has 'filename'
 		console.log "Successfully set a resource in the container!"
 
-To access the value, use - you guessed it - `get`. The result of `get`, however, is not the resource as you'd expect, but a `Promise`. A `Promise` has a singular method, `then`, that accepts two arguments: the first one will be called if the promise was kept and resolved to a value, the second one in case there was an error and the promise was rejected. (Promises are one suggestion for a standard asynchronous interface suggested by and discussed at [CommonJS][cjs-promise]. Go check it out!) In this case, the promise will always immediately be resolved to a value.
-
-[cjs-promise]: http://wiki.commonjs.org/wiki/Promises
+To access the value, use - you guessed it - `get`. The result of `get`, however, is not the resource as you'd expect, but a `Promise`. A `Promise` has a singular method, `then`, that accepts two arguments: the first one will be called if the promise was kept and resolved to a value, the second one in case there was an error and the promise was rejected. In this case, the promise will always immediately be resolved to a value.
 
 	c.get('filename').then (filename) ->
 		console.log filename

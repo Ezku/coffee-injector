@@ -36,6 +36,7 @@
       topic: function() {
         return new Container;
       },
+      'what happens if i call the container': function(c) {},
       'has should return false': function(c) {
         return c.has('foo').should.be["false"];
       },
@@ -98,7 +99,6 @@
         topic: async(function(c, success, failure) {
           c.describe('qux', function(result) {
             return this.get('foo').then(function(foo) {
-              console.log('lol');
               return result(foo);
             });
           });
