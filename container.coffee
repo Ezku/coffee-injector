@@ -75,3 +75,4 @@ module.exports = class Container
 	describe: (name, descriptor) ->
 		@resources[name] = descriptor
 		this
+	

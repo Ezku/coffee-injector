@@ -36,7 +36,6 @@
       topic: function() {
         return new Container;
       },
-      'what happens if i call the container': function(c) {},
       'has should return false': function(c) {
         return c.has('foo').should.be["false"];
       },
@@ -70,6 +69,16 @@
           return e.should.be.an["instanceof"](Error);
         }
       }
+      /* TODO
+      		'when describing a resource as shared':
+      			topic: async (c, success, failure) ->
+      				c.describe 'foo', (result) -> @shared -> result {}
+      				c.get('foo', 'foo').then success, failure
+
+      			'the resource should be the same for every access': (results) ->
+      				[first, second] = results
+      				first.should.equal second
+      		*/
     },
     'given a succeeding resource description': {
       topic: function() {

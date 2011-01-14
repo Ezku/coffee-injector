@@ -55,7 +55,17 @@ vows
 			catch e
 				e.should.not.be.an.instanceof RangeError
 				e.should.be.an.instanceof Error
-	
+		
+		### TODO
+		'when describing a resource as shared':
+			topic: async (c, success, failure) ->
+				c.describe 'foo', (result) -> @shared -> result {}
+				c.get('foo', 'foo').then success, failure
+		
+			'the resource should be the same for every access': (results) ->
+				[first, second] = results
+				first.should.equal second
+		###
 	'given a succeeding resource description':
 		topic: ->
 			c = new Container
