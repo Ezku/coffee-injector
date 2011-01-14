@@ -154,13 +154,12 @@ of the script.
 
 ## Cyclic dependency detection
 
-A cyclic dependency means a situation when two resources depend on one 
-another either directly (which is usually pretty easy to spot) or 
-indirectly through a third party or several (debugging which can be 
-tedious). Given the relative ease at which these situations can arise 
-during development, their prevention is an important feature in 
-dependency injection containers. Coffee-Injector obviously does this as 
-well.
+A cyclic dependency means a situation where a resource depends on itself 
+either directly (which is usually pretty easy to spot) or indirectly 
+through another resource or several (debugging which can be tedious). 
+Given the relative ease at which these situations can arise during 
+development, their prevention is an important feature in dependency 
+injection containers. Coffee-Injector obviously does this as well.
 
 In some other languages, cyclic dependencies can be found through static 
 analysis of the dependency graph, but the dynamic nature of Javascript 
