@@ -30,49 +30,60 @@ all = (promises) -> promise (resolve, reject) ->
 				rejected.push error
 				do next
 
-###
-TODO: Separate container into two parts: resource description and dependency
-resolution. This will allow for all kinds of helpers in the resource description
-part while keeping the dependency resolver clean.
+multimethod = (single, multiple) -> ->
+	if arguments.length is 1
+		single.apply this, arguments
+	else
+		multiple.call this, arguments
 
-Resolver:
-- has
-- get
-Descriptor:
-- set
-- describe
-###
-module.exports = class Container
+class Resolver
 	resources: null
 	busy: null
 	
 	constructor: (@resources = {}, @busy = []) ->
 	
-	has: (name) ->
-		@resources[name]?
+	has: multimethod(
+		(name) ->
+			@resources[name]?
+		(names) ->
+			return true for name in names when @has name
+			return false
+	)
 	
-	set: (name, value) ->
-		@describe name, (result, error) ->
-			result value
-	
-	using: (name) ->
-		if name in @busy
-			throw new Error("Recursive definition of resource '#{name}' detected")
-		new Container @resources, [@busy..., name]
-
-	get: (name) ->
-		if arguments.length is 1
-			unless @resources[name]?
+	get: multimethod(
+		(name) ->
+			unless @has name
 				throw new Error("Resource '#{name}' not available")
 			scope = @using name
 			promise (resolve, reject) =>
 				@resources[name].call scope, resolve, reject, scope
-		
-		else
-			promises = (@get name for name in arguments)
+		(names) ->
+			promises = (@get name for name in names)
 			all promises
+	)
+	
+	using: (name) ->
+		if name in @busy
+			throw new Error("Recursive definition of resource '#{name}' detected")
+		new Resolver @resources, [@busy..., name]
+
+module.exports = class Container
+	resources: null
+	
+	constructor: (@resources = {}) ->
+
+	resolver: -> new Resolver(@resources)
 
 	describe: (name, descriptor) ->
 		@resources[name] = descriptor
 		this
+
+	set: (name, value) ->
+		@describe name, (result, error) ->
+			result value
 	
+	has: (name) ->
+		@resources[name]?
+	
+	get: ->
+		@resolver().get arguments...

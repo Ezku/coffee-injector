@@ -1,10 +1,15 @@
 (function() {
-  var Assertion, Container, EventEmitter, async, expect, vows;
-  var __slice = Array.prototype.slice;
+  var Assertion, Container, EventEmitter, async, expect, vows,
+    __slice = Array.prototype.slice;
+
   vows = require('vows');
+
   Container = require('../container');
+
   Assertion = require('should').Assertion;
+
   EventEmitter = require('events').EventEmitter;
+
   Assertion.prototype["throw"] = Assertion.prototype.thrown = function(f) {
     try {
       f();
@@ -14,6 +19,7 @@
     }
     return this;
   };
+
   async = function(f) {
     return function() {
       var promise;
@@ -26,11 +32,13 @@
       return promise;
     };
   };
+
   expect = function(expectation) {
     return function(result) {
       return result.should.equal(expectation);
     };
   };
+
   vows.describe('Using the coffee injector container').addBatch({
     'given an empty container': {
       topic: function() {
@@ -68,17 +76,32 @@
           e.should.not.be.an["instanceof"](RangeError);
           return e.should.be.an["instanceof"](Error);
         }
+      },
+      'when adding a helper': {
+        topic: async(function(c, success, failure) {
+          return c.helper('trivial', function(name, promise, descriptor) {});
+        })
       }
-      /* TODO
+      /*
       		'when describing a resource as shared':
       			topic: async (c, success, failure) ->
-      				c.describe 'foo', (result) -> @shared -> result {}
+      				shared = {}
+      				# The following as a method in a dynamically created class? Would allow for
+      				c.helper 'shared', (name, promise, descriptor) -> 
+      					if shared[name]?
+      						shared[name]
+      					else
+      						descriptor().then (success) ->
+      							shared[name] = 
+      				
+      				c.describe 'foo', -> @shared (result) ->
+      					result {}
       				c.get('foo', 'foo').then success, failure
-
+      		
       			'the resource should be the same for every access': (results) ->
       				[first, second] = results
       				first.should.equal second
-      		*/
+      */
     },
     'given a succeeding resource description': {
       topic: function() {
@@ -166,4 +189,5 @@
       }
     }
   })["export"](module);
+
 }).call(this);
