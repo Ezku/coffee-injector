@@ -1,6 +1,5 @@
 (function() {
-  var Assertion, Container, EventEmitter, async, expect, vows,
-    __slice = Array.prototype.slice;
+  var Assertion, Container, EventEmitter, expect, promising, promisingFailure, vows;
 
   vows = require('vows');
 
@@ -20,15 +19,28 @@
     return this;
   };
 
-  async = function(f) {
+  promising = function(f) {
     return function() {
       var promise;
       promise = new EventEmitter;
-      f.apply(null, __slice.call(arguments).concat([function(value) {
+      f.apply(null, arguments).then(function(value) {
         return promise.emit('success', value);
-      }], [function(error) {
+      }, function(error) {
         return promise.emit('error', error);
-      }]));
+      });
+      return promise;
+    };
+  };
+
+  promisingFailure = function(f) {
+    return function() {
+      var promise;
+      promise = new EventEmitter;
+      f.apply(null, arguments).then(function(error) {
+        return promise.emit('error', error);
+      }, function(value) {
+        return promise.emit('success', value);
+      });
       return promise;
     };
   };
@@ -76,15 +88,15 @@
           e.should.not.be.an["instanceof"](RangeError);
           return e.should.be.an["instanceof"](Error);
         }
-      },
-      'when adding a helper': {
-        topic: async(function(c, success, failure) {
-          return c.helper('trivial', function(name, promise, descriptor) {});
-        })
       }
-      /*
+      /* TODO
+      		
+      		'when adding a helper':
+      			topic: promising (c, success, failure) ->
+      				c.helper 'trivial', (name, promise, descriptor) ->
+      					
       		'when describing a resource as shared':
-      			topic: async (c, success, failure) ->
+      			topic: promising (c, success, failure) ->
       				shared = {}
       				# The following as a method in a dynamically created class? Would allow for
       				c.helper 'shared', (name, promise, descriptor) -> 
@@ -112,14 +124,14 @@
         });
       },
       'when attempting retrieval': {
-        topic: async(function(c, success, failure) {
-          return c.get('foo').then(success, failure);
+        topic: promising(function(c) {
+          return c.get('foo');
         }),
         'should recieve a value in the success callback': expect('bar')
       },
       'when retrieving multiple values at a time': {
-        topic: async(function(c, success, failure) {
-          return c.get('foo', 'foo').then(success, failure);
+        topic: promising(function(c) {
+          return c.get('foo', 'foo');
         }),
         'should recieve all selected values': function(values) {
           var first, second;
@@ -128,13 +140,13 @@
         }
       },
       'when describing another resource that accesses the first resource': {
-        topic: async(function(c, success, failure) {
+        topic: promising(function(c) {
           c.describe('qux', function(result) {
             return this.get('foo').then(function(foo) {
               return result(foo);
             });
           });
-          return c.get('qux').then(success, failure);
+          return c.get('qux');
         }),
         'should be able to successfully retrieve the value': expect('bar')
       }
@@ -148,16 +160,16 @@
         });
       },
       'when attempting retrieval': {
-        topic: async(function(c, success, failure) {
-          c.get('foo').then(failure, success);
+        topic: promisingFailure(function(c) {
+          c.get('foo');
           return {
             'should recieve a value in the failure callback': expect('bar')
           };
         })
       },
       'when retrieving multiple values at a time': {
-        topic: async(function(c, success, failure) {
-          return c.get('foo', 'foo').then(failure, success);
+        topic: promisingFailure(function(c) {
+          return c.get('foo', 'foo');
         }),
         'should recieve all errors in the failure callback': function(errors) {
           var first, second;
@@ -179,8 +191,8 @@
       },
       'when retrieving both values': function() {
         return {
-          topic: async(function(c, success, failure) {
-            return c.get('foo', 'bar').then(failure, success);
+          topic: promisingFailure(function(c) {
+            return c.get('foo', 'bar');
           }),
           'should recieve an error in the failure callback': function(errors) {
             return errors[0].should.equal('nay');

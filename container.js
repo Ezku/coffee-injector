@@ -53,18 +53,6 @@
         return single.apply(this, arguments);
       } else {
         return multiple.call(this, arguments);
-        /*
-        		TODO: Separate container into two parts: resource description and dependency
-        		resolution. This will allow for all kinds of helpers in the resource description
-        		part while keeping the dependency resolver clean.
-        
-        		Resolver:
-        		- has
-        		- get
-        		Descriptor:
-        		- set
-        		- describe
-        */
       }
     };
   };

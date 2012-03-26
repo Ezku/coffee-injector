@@ -11,11 +11,20 @@ Assertion::throw = Assertion::thrown = (f) ->
 		e.should.be.an.instanceof @obj
 	@
 
-async = (f) -> ->
+promising = (f) -> ->
 	promise = new EventEmitter
-	f arguments...,
+	f(arguments...).then(
 		(value) -> promise.emit 'success', value
 		(error) -> promise.emit 'error', error
+	)
+	promise
+
+promisingFailure = (f) -> ->
+	promise = new EventEmitter
+	f(arguments...).then(
+		(error) -> promise.emit 'error', error
+		(value) -> promise.emit 'success', value
+	)
 	promise
 
 expect = (expectation) -> (result) ->
@@ -56,14 +65,14 @@ vows
 				e.should.not.be.an.instanceof RangeError
 				e.should.be.an.instanceof Error
 		
+		### TODO
+		
 		'when adding a helper':
-			topic: async (c, success, failure) ->
+			topic: promising (c, success, failure) ->
 				c.helper 'trivial', (name, promise, descriptor) ->
 					
-		
-		###
 		'when describing a resource as shared':
-			topic: async (c, success, failure) ->
+			topic: promising (c, success, failure) ->
 				shared = {}
 				# The following as a method in a dynamically created class? Would allow for
 				c.helper 'shared', (name, promise, descriptor) -> 
@@ -88,25 +97,25 @@ vows
 			c.describe 'foo', (result) -> result 'bar'
 		
 		'when attempting retrieval':
-			topic: async (c, success, failure) ->
-				c.get('foo').then success, failure
+			topic: promising (c) ->
+				c.get('foo')
 				
 			'should recieve a value in the success callback': expect 'bar'
 		
 		'when retrieving multiple values at a time':
-			topic: async (c, success, failure) ->
-				c.get('foo', 'foo').then success, failure
+			topic: promising (c) ->
+				c.get('foo', 'foo')
 			
 			'should recieve all selected values': (values) ->
 				[first, second] = values
 				'bar'.should.equal(first).and.equal(second)
 		
 		'when describing another resource that accesses the first resource':
-			topic: async (c, success, failure) ->
+			topic: promising (c) ->
 				c.describe 'qux', (result) ->
 					@get('foo').then (foo) ->
 						result foo
-				c.get('qux').then success, failure
+				c.get('qux')
 			
 			'should be able to successfully retrieve the value': expect 'bar'
 				
@@ -117,14 +126,14 @@ vows
 			c.describe 'foo', (result, error) -> error 'bar'
 		
 		'when attempting retrieval':
-			topic: async (c, success, failure) ->
-				c.get('foo').then failure, success
+			topic: promisingFailure (c) ->
+				c.get('foo')
 		
 				'should recieve a value in the failure callback': expect 'bar'
 		
 		'when retrieving multiple values at a time':
-			topic: async (c, success, failure) ->
-				c.get('foo', 'foo').then failure, success
+			topic: promisingFailure (c) ->
+				c.get('foo', 'foo')
 
 			'should recieve all errors in the failure callback': (errors) ->
 				[first, second] = errors
@@ -137,8 +146,8 @@ vows
 			c.describe 'bar', (result, error) -> error 'nay'
 		
 		'when retrieving both values': ->
-			topic: async (c, success, failure) ->
-				c.get('foo', 'bar').then failure, success
+			topic: promisingFailure (c) ->
+				c.get('foo', 'bar')
 			
 			'should recieve an error in the failure callback': (errors) ->
 				errors[0].should.equal 'nay'
