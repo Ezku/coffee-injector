@@ -1,4 +1,4 @@
-{defer} = require './node-promise/promise'
+{defer} = require 'node-promise'
 
 promise = (f) ->
 	deferred = defer()
