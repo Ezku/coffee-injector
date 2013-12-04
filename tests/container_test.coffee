@@ -65,31 +65,28 @@ vows
 				e.should.not.be.an.instanceof RangeError
 				e.should.be.an.instanceof Error
 		
-		### TODO
-		
-		'when adding a helper':
-			topic: promising (c, success, failure) ->
-				c.helper 'trivial', (name, promise, descriptor) ->
-					
-		'when describing a resource as shared':
-			topic: promising (c, success, failure) ->
-				shared = {}
-				# The following as a method in a dynamically created class? Would allow for
-				c.helper 'shared', (name, promise, descriptor) -> 
-					if shared[name]?
-						shared[name]
-					else
-						descriptor().then (success) ->
-							shared[name] = 
-				
-				c.describe 'foo', -> @shared (result) ->
-					result {}
-				c.get('foo', 'foo').then success, failure
-		
-			'the resource should be the same for every access': (results) ->
-				[first, second] = results
-				first.should.equal second
-		###
+#		'when adding a helper':
+#			topic: promising (c, success, failure) ->
+#				c.helper 'trivial', (name, promise, descriptor) ->
+#					
+#		'when describing a resource as shared':
+#			topic: promising (c, success, failure) ->
+#				shared = {}
+#				# The following as a method in a dynamically created class? Would allow for
+#				c.helper 'shared', (name, promise, descriptor) -> 
+#					if shared[name]?
+#						shared[name]
+#					else
+#						descriptor().then (success) ->
+#							shared[name] = 
+#				
+#				c.describe 'foo', -> @shared (result) ->
+#					result {}
+#				c.get('foo', 'foo').then success, failure
+#		
+#			'the resource should be the same for every access': (results) ->
+#				[first, second] = results
+#				first.should.equal second
 
 	'given a succeeding resource description':
 		topic: ->
