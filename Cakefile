@@ -6,7 +6,7 @@ handleOutput = (error, stdout, stderr) ->
 	console.log stderr if stderr
 
 task 'compile', 'compile coffeescript source code', ->
-	exec 'coffee -c .', handleOutput
+	exec 'coffee -c container.coffee', handleOutput
 
 task 'test', 'run test suite', ->
 	invoke 'compile'
