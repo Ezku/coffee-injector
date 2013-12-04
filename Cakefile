@@ -10,4 +10,4 @@ task 'compile', 'compile coffeescript source code', ->
 
 task 'test', 'run test suite', ->
 	invoke 'compile'
-	exec 'vows tests/*test.coffee', handleOutput
+	exec 'node_modules/.bin/vows tests/*test.coffee', handleOutput
