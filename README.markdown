@@ -1,4 +1,6 @@
-# Coffee-Injector in short
+[![Build Status](https://travis-ci.org/Ezku/coffee-injector.png)](https://travis-ci.org/Ezku/coffee-injector)
+
+# Coffee-Injector in short 
 
 Coffee-Injector is a very small dependency injection container intended 
 to fit both Javascript as a language and node.js as an environment where 
