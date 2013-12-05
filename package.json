@@ -1,0 +1,28 @@
+{
+  "name": "coffee-injector",
+  "version": "0.0.0",
+  "description": "An asynchronous dependency injection container written in coffeescript.",
+  "main": "container.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vows tests/*test.coffee"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Ezku/coffee-injector.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ezku/coffee-injector/issues"
+  },
+  "homepage": "https://github.com/Ezku/coffee-injector",
+  "dependencies": {
+    "vows": "~0.7.0",
+    "should": "~2.1.0",
+    "node-promise": "~0.5.10"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.6.3"
+  }
+}
